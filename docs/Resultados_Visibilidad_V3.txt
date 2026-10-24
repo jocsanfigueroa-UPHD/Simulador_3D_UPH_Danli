@@ -1,0 +1,8 @@
+{
+  fg: 'rgb(242, 245, 251)',
+  bg: 'rgb(35, 49, 73)',
+  listOverflow: 'visible',
+  listHeight: 'none'
+}
+Mostrar/ocultar todo, aislar, herencia y móvil: aprobados
+Errores JavaScript: 0

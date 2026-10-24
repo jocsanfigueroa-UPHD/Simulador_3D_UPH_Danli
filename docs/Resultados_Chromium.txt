@@ -1,0 +1,18 @@
+status Modelo cargado · 350 mallas · 30976 triángulos
+errors []
+lineas lineas
+puntos puntos
+liveX 2
+techoY 0.7853981633974483
+recover 2
+mobile { w: 390, sw: 390 }
+rejectZero true
+degreesOnce true
+hideRoof true
+showRoof true
+final {
+  triangles: 'Modelo cargado · 350 mallas · 30976 triángulos',
+  roofTriangles: 6,
+  labels: false
+}
+allErrors []

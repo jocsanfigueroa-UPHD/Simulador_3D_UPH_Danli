@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UPH Danlí · Simulador 3D del Edificio</title>
+  <link rel="stylesheet" href="./css/estilos.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/controls/OrbitControls.js":"./vendor/OrbitControls.js"}}</script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       ENCABEZADO
+       Responsable visual: Andrea Celeste Cubas Rodríguez
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <header>
+    <div class="header-inner brand-header">
+      <div class="brand-logo"><img src="./images/logo-simulador-uph.png" alt="Logo del Simulador 3D UPH Danlí" width="140" height="140"></div>
+      <div class="brand-heading">
+      <h1>Simulador 3D del Edificio</h1>
+      <p class="subtitle">UPH Danlí</p>
+      <h2>IS-332 · INFORMÁTICA GRÁFICA APLICADA</h2>
+      <p class="creditos">Proyecto</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       CONTENIDO PRINCIPAL
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <main>
+
+    <!-- ─── VISOR 3D ──────────────────────────────────────────────────── -->
+    <section class="viewer-section">
+      <div class="viewer-toolbar"><span class="badge">UPH DANLÍ · LABORATORIO 3D</span><div><button id="vista-general">Encuadrar edificio</button><button id="vista-corredor">Ver corredor</button><button id="vista-frontal">Vista frontal</button><button id="btnEtiquetas">Etiquetas</button></div></div>
+      <p id="estadoVisor" role="status">Preparando el edificio…</p>
+      <div id="visor3D" class="visor3D"></div>
+      <p class="axis-guide"><span class="axis-x">X · Ancho</span><span class="axis-y">Y · Altura</span><span class="axis-z">Z · Profundidad</span></p><p class="hint">
+        🖱 Arrastra para girar · Rueda para acercar · Clic derecho para desplazar
+      </p>
+    </section>
+
+    <!-- ─── PANEL DE CONTROLES ────────────────────────────────────────── -->
+    <aside class="panel">
+
+      <!-- == VISTA == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Primitivas a dibujar</h3>
+<label class="sr-only" for="modoDibujo">Modo de dibujo</label><select id="modoDibujo" class="selector"><option value="solido">TRIÁNGULOS · Sólido</option><option value="lineas">LÍNEAS · Triangulación</option><option value="puntos">PUNTOS · Vértices</option></select>
+<p class="control-help">Explore cómo las primitivas forman el edificio.</p>
+        <div class="btn-group">
+          <button id="btnModoAlambre" class="btn-panel">Modo alámbrico</button>
+          <button id="btnCuadricula" class="btn-panel" aria-pressed="false">Cuadrícula</button>
+          <button id="btnEjes"        class="btn-panel">Mostrar ejes</button>
+        </div>
+      </div>
+
+      <!-- == SELECCIÓN == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Objeto seleccionado</h3>
+        <select id="selectorObjeto" class="selector"></select>
+      </div>
+
+      <!-- == TRASLACIÓN == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Traslación en tiempo real <span class="unit">(unidades)</span></h3>
+        <div class="inputs-xyz live-controls">
+          <label>X <input id="traslacionX" type="number" step="0.1" value="0"><input type="range" id="traslacionXR" min="-10" max="10" data-min="-10" data-max="10" step=".1" value="0" aria-label="traslacion eje X"></label>
+          <label>Y <input id="traslacionY" type="number" step="0.1" value="0"><input type="range" id="traslacionYR" min="-10" max="10" data-min="-10" data-max="10" step=".1" value="0" aria-label="traslacion eje Y"></label>
+          <label>Z <input id="traslacionZ" type="number" step="0.1" value="0"><input type="range" id="traslacionZR" min="-10" max="10" data-min="-10" data-max="10" step=".1" value="0" aria-label="traslacion eje Z"></label>
+        </div>
+      </div>
+
+      <!-- == ROTACIÓN == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Rotación en tiempo real <span class="unit">(grados °)</span></h3>
+        <div class="inputs-xyz live-controls">
+          <label>X <input id="rotacionX" type="number" step="5" value="0"><input type="range" id="rotacionXR" min="-180" max="180" data-min="-180" data-max="180" step="1" value="0" aria-label="rotacion eje X"></label>
+          <label>Y <input id="rotacionY" type="number" step="5" value="0"><input type="range" id="rotacionYR" min="-180" max="180" data-min="-180" data-max="180" step="1" value="0" aria-label="rotacion eje Y"></label>
+          <label>Z <input id="rotacionZ" type="number" step="5" value="0"><input type="range" id="rotacionZR" min="-180" max="180" data-min="-180" data-max="180" step="1" value="0" aria-label="rotacion eje Z"></label>
+        </div>
+      </div>
+
+      <!-- == ESCALA == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Escala <span class="unit">(factor ×)</span></h3>
+        <div class="inputs-xyz live-controls">
+          <label>X <input id="escalaX" type="number" step="0.1" min="0.01" value="1"><input type="range" id="escalaXR" min=".1" max="3" data-min=".1" data-max="3" step=".05" value="1" aria-label="escala eje X"></label>
+          <label>Y <input id="escalaY" type="number" step="0.1" min="0.01" value="1"><input type="range" id="escalaYR" min=".1" max="3" data-min=".1" data-max="3" step=".05" value="1" aria-label="escala eje Y"></label>
+          <label>Z <input id="escalaZ" type="number" step="0.1" min="0.01" value="1"><input type="range" id="escalaZR" min=".1" max="3" data-min=".1" data-max="3" step=".05" value="1" aria-label="escala eje Z"></label>
+        </div>
+      </div>
+
+      <!-- == ACCIONES == -->
+      <div class="panel-block">
+        <div class="btn-group">
+          <button id="btnAplicar"          class="btn-apply">Aplicar</button>
+          <button id="btnRestablecer"      class="btn-panel">Restablecer objeto</button>
+          <button id="btnRestablecerTodos" class="btn-panel">Restablecer todo</button>
+        </div>
+      </div>
+
+      <!-- == INFORMACIÓN == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Información del objeto</h3>
+        <div id="infoPanel" class="info-panel">
+          Selecciona un objeto y pulsa <em>Aplicar</em>.
+        </div>
+      </div>
+
+      <!-- == VISIBILIDAD == -->
+      <div class="panel-block">
+        <h3 class="panel-title">Visibilidad de componentes</h3>
+        <p class="control-help">Marque un componente para mostrarlo. Si su grupo está oculto, actívelo también.</p>
+        <div class="visibility-actions"><button id="btnMostrarTodo" type="button">Mostrar todo</button><button id="btnOcultarTodo" type="button">Ocultar todo</button><button id="btnSoloSeleccionado" type="button">Solo seleccionado</button></div>
+        <p id="resumenVisibilidad" class="visibility-summary" aria-live="polite"></p>
+        <div id="partesList" class="parts-list"></div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       PIE DE PÁGINA
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <footer>
+    <p>
+      Proyecto realizado por estudiantes:<br>
+      <small>
+        Jocsan Yair Zelaya Figueroa &nbsp;·&nbsp;
+        Eliezer Yair Reyes Ávila &nbsp;·&nbsp;
+        Andrea Celeste Cubas Rodríguez &nbsp;·&nbsp;
+        Tatiana Vaytares Ochoa Aguilar &nbsp;·&nbsp;
+        Katherin Griselle Martínez Arita
+      </small>
+    </p>
+  </footer>
+
+  <!-- ─── Script principal (módulos ES + Vite) ─────────────────────────── -->
+  <script type="module">
+const estado=document.getElementById('estadoVisor');
+if(location.protocol==='file:'){estado.textContent='Para iniciar, ejecute INICIAR_WINDOWS.bat o node servidor.cjs y abra http://localhost:8080.';}
+else {import('./js/main.js').catch(error=>{console.error(error);estado.textContent='No se pudo iniciar el visor: '+error.message;estado.classList.add('error');});}
+</script>
+
+</body>
+</html>
